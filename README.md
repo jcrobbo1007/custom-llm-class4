@@ -398,6 +398,17 @@ categories require — that is what makes this a **development benchmark**, not 
 Any claim about unseen generalisation would need tests that never influenced my choices.
 These 48 cases influenced mine.
 
+**Disclosure — deliberate vocabulary seeding.** The final block of
+[corpus/extension/negation.md](corpus/extension/negation.md) (lines 76–91, from
+`the blue kite flew over the wide field .` onward) consists of ordinary sentences written to
+bring the negation cases' answer-choice vocabulary — `milk`, `tea`, `bread`, `rice`,
+`closed`, `open`, `missing`, `wide`, `blue` — into the training text, as the eval guide
+permits; none reproduces a test prompt, story, or choice list. Those 16 lines are why five of
+the six targeted cases moved from `out_of_vocabulary` to `scored`. They bought **coverage
+only**: all five then scored 0, which is the central finding above. The one case they did not
+rescue is `lang_32`, because seeding its remaining unknown word would have meant writing the
+name `ava` from the test story itself.
+
 ---
 
 ## Chat interface
