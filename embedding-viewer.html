@@ -11,11 +11,67 @@
 @media(min-width:1400px){.stage{min-height:490px}}@media(max-width:950px){main{padding:20px}.workspace{grid-template-columns:minmax(0,1fr) 280px}.toolbar{padding:12px}.segmented button{padding:7px 9px}.inspector{padding:17px}.map-footer{align-items:flex-start;flex-direction:column}.hint{max-width:50%;font-size:12px}.stage{min-height:470px}}@media(max-width:700px){header{padding:12px 16px}.course{display:none}main{padding:20px 12px}.intro{display:block}.live-badge{display:inline-block;margin-top:12px}.intro p{font-size:14px}.workspace{grid-template-columns:1fr}.stage{height:420px;min-height:420px;flex:none}.inspector{padding:20px}.context{grid-template-columns:1fr;gap:16px}.inspector-head{justify-content:flex-start}.inspector select{margin-left:auto}.vector{gap:3px}.map-footer{flex-direction:row;flex-wrap:wrap}.toolbar{padding:12px}.hint{bottom:58px;max-width:none}.file-row{align-items:flex-start}.brand{font-size:15px}}
 .vector{max-height:245px;overflow-y:auto;padding-right:5px}.inspector select{max-width:155px}.stage-label strong{font-size:18px}
 </style>
+<style>
+.chatpanel{border:1px solid var(--line);border-radius:13px;background:white;box-shadow:0 8px 35px #13284108;padding:20px 22px;margin-bottom:20px}
+.chatpanel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.chatpanel h2{font-size:18px;letter-spacing:-.02em;margin:3px 0 6px}
+.chatpanel .note{max-width:80ch}
+.chat-chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 12px}
+.chip{font-size:13px;padding:6px 11px;border-radius:30px;background:#f4f6fa;color:#39516b}
+.chip:hover{background:#e8eef5}
+.chat-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#chat-input{flex:1;min-width:260px;border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:white;color:var(--ink)}
+.chat-temp{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--muted)}
+.chat-temp select{padding:7px 9px}
+#chat-send{font-weight:650;background:var(--navy);color:white;border-color:var(--navy)}
+#chat-send:hover{background:#21405f}
+.chat-log{display:grid;gap:10px;margin-top:16px}
+.chat-log:empty{margin-top:0}
+.turn{border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:#fbfcfe}
+.turn .you{font-weight:700;font-size:14px;color:#39516b;overflow-wrap:anywhere}
+.turn .reply{margin-top:5px;font-size:15px;overflow-wrap:anywhere}
+.turn .reply em{color:var(--muted)}
+.turn .meta{margin-top:7px;font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.turn .flag{color:#8a5a12}
+.chat-foot{margin-top:12px;font-size:12.5px}
+.chatpanel .live-badge.off{border-color:#e4c7c7;background:#fbeeee;color:#8d2d2d}
+.chatpanel .live-badge.off:before{background:#b34545}
+@media(max-width:820px){.chat-form{flex-direction:column;align-items:stretch}}
+</style>
 </head>
 <body>
 <header><div class="brand"><span>04</span> Building a Custom LLM</div><div class="course">Fall 26 · Inside the model</div></header>
 <main>
   <div class="intro"><div><h1>Inside the embedding space</h1><p>Every dot is a token. Its position comes from numbers the model actually learned.</p></div><span class="live-badge">Real model weights</span></div>
+  <section class="chatpanel" aria-label="Chat with the trained model">
+    <div class="chatpanel-head">
+      <div>
+        <span class="eyebrow">Live inference</span>
+        <h2>Chat with the trained model</h2>
+        <p class="note" id="chat-label">Tiny language model — continues a sentence, 48-token context, each prompt starts fresh, unknown words listed.</p>
+      </div>
+      <span class="live-badge" id="chat-status">connecting…</span>
+    </div>
+    <div class="chat-chips" id="chat-chips">
+      <button type="button" class="chip" data-prompt="the report about the nurse explains the">the report about the nurse explains the</button>
+      <button type="button" class="chip" data-prompt="the opposite of tall is">the opposite of tall is</button>
+      <button type="button" class="chip" data-prompt="the cup is not clean . it is dirty . the cup is">the cup is not clean . it is dirty . the cup is</button>
+    </div>
+    <form class="chat-form" id="chat-form">
+      <input id="chat-input" type="text" autocomplete="off" placeholder="Type a sentence for the model to continue…" aria-label="Prompt">
+      <label class="chat-temp">Temperature
+        <select id="chat-temp" aria-label="Temperature">
+          <option value="0.3">0.3</option>
+          <option value="0.8" selected>0.8</option>
+          <option value="1.2">1.2</option>
+        </select>
+      </label>
+      <button type="submit" id="chat-send">Send</button>
+      <button type="button" id="chat-clear">Clear</button>
+    </form>
+    <div class="chat-log" id="chat-log" aria-live="polite"></div>
+    <p class="note chat-foot" id="chat-foot"></p>
+  </section>
   <section class="workspace" aria-label="Interactive embedding explorer">
     <div class="map-column">
       <div class="toolbar"><div class="segmented" aria-label="Training state"><button id="before" aria-pressed="false">Before training</button><button id="after" aria-pressed="true">After training</button></div><label class="toggle"><input id="trails" type="checkbox"> Show movement</label></div>
@@ -215,6 +271,79 @@ $('checkpoint').onchange=async e=>{const file=e.target.files[0];if(!file)return;
 $('reference').onclick=()=>{applyModel(reference);$('file-status').classList.remove('error');$('file-status').textContent='Reference model restored. Files stay on your device.';};
 new ResizeObserver(draw).observe($('stage'));
 applyModel(reference);
+</script>
+<script>
+/* Chat panel. Talks to serve.py on the same origin; the viewer's own code is untouched.
+   Opened as a bare file:// page there is no backend, so the panel disables itself and
+   the embedding viewer below continues to work exactly as before. */
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var log=$('chat-log'), status=$('chat-status'), foot=$('chat-foot');
+  var form=$('chat-form'), input=$('chat-input'), send=$('chat-send');
+  var online=false, meta=null;
+
+  function offline(msg){
+    online=false; status.textContent=msg; status.classList.add('off');
+    send.disabled=true; input.disabled=true;
+    foot.textContent='Start the backend with: python serve.py — then open http://localhost:4321';
+  }
+
+  fetch('meta').then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(m){
+    meta=m; online=true;
+    status.textContent='model loaded';
+    foot.textContent='Model '+m.model+' · SHA-256 '+m.model_sha256.slice(0,12)+'… · '+
+      m.completed_steps.toLocaleString()+' training steps · vocabulary '+m.vocabulary_size+
+      ' · context '+m.block_size+' tokens. Replies come from this local model only; no external API is called and nothing is retrained.';
+    autoloadCheckpoint();
+  }).catch(function(){ offline('backend not running'); });
+
+  /* Feed results/exp2-extended/checkpoint.json into the viewer's own file input, exactly
+     as a user picking the file would. No viewer internals are touched. */
+  function autoloadCheckpoint(){
+    var el=document.getElementById('checkpoint');
+    if(!el||typeof DataTransfer==='undefined') return;
+    fetch('checkpoint.json').then(function(r){ if(!r.ok) throw 0; return r.blob(); }).then(function(b){
+      var dt=new DataTransfer();
+      dt.items.add(new File([b],'checkpoint.json',{type:'application/json'}));
+      el.files=dt.files;
+      el.dispatchEvent(new Event('change',{bubbles:true}));
+    }).catch(function(){});
+  }
+
+  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  function addTurn(prompt,data){
+    var d=document.createElement('div'); d.className='turn';
+    var bits=['<span>temperature '+data.temperature+'</span>','<span>seed '+data.seed+'</span>'];
+    if(data.unknown_words&&data.unknown_words.length)
+      bits.push('<span class="flag">unknown words: '+esc(data.unknown_words.join(', '))+'</span>');
+    if(data.truncated)
+      bits.push('<span class="flag">prompt over '+(meta?meta.block_size:48)+' tokens — only the most recent context was used</span>');
+    d.innerHTML='<div class="you">You: '+esc(prompt)+'</div>'+
+      '<div class="reply">Model: '+(data.reply?esc(data.reply):'<em>[empty response]</em>')+'</div>'+
+      '<div class="meta">'+bits.join('')+'</div>';
+    log.appendChild(d); d.scrollIntoView({block:'nearest'});
+  }
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var prompt=input.value.trim(); if(!prompt||!online) return;
+    send.disabled=true; send.textContent='…';
+    fetch('chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:prompt,temperature:parseFloat($('chat-temp').value)})})
+      .then(function(r){ return r.json(); })
+      .then(function(data){ addTurn(prompt,data); input.value=''; })
+      .catch(function(){ offline('backend unreachable'); })
+      .finally(function(){ send.disabled=!online; send.textContent='Send'; input.focus(); });
+  });
+
+  $('chat-clear').addEventListener('click',function(){ log.innerHTML=''; input.value=''; input.focus(); });
+  $('chat-chips').addEventListener('click',function(e){
+    var b=e.target.closest('.chip'); if(!b) return;
+    input.value=b.dataset.prompt; input.focus();
+  });
+})();
 </script>
 </body>
 </html>

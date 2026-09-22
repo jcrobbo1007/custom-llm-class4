@@ -77,3 +77,25 @@ the repo, not a problem to fix.
 4. **Open the repo signed out** and confirm both executed notebooks render with outputs, the
    SVG shows, and the result links resolve.
 5. **Submit** the URL via bCourses / the submissions portal.
+
+## Web chat interface (added after submission)
+
+6. **`serve.py` + chat panel in `embedding-viewer.html`.** FastAPI backend on
+   `localhost:4321` serving the viewer page plus `GET /meta`, `GET /checkpoint.json` and
+   `POST /chat`. It imports `load_model`/`generate_reply`/`model_hash` from `run_evals.py`
+   rather than reimplementing them, so web and terminal replies are identical — proved by
+   `scripts/verify_web_parity.py`, output in `chat/web_parity_check.txt` (4/4 MATCH).
+   No external API, no retraining, fresh 48-token context per request.
+
+   Launch: `pip install -r requirements.txt` then `python serve.py`, open
+   http://localhost:4321. `fastapi` and `uvicorn` were added to `requirements.txt` and are
+   needed only for this; the notebook and `chat.py` still need just `torch`.
+
+   Evidence: `chat/web-chat-screenshot.png` is a **real browser screenshot** (Playwright
+   driving Chromium), four prompts typed and sent through the page.
+   `chat/web-chat-fullpage.png` shows the embedding viewer still fully working below the
+   panel with the exp 2 checkpoint auto-loaded.
+
+   `embedding-viewer.html` is now the one file that genuinely differs from upstream. Nothing
+   existing was altered — the panel was appended and the checkpoint is fed through the
+   viewer's own file input. The README states this explicitly.

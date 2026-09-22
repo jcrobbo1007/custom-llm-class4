@@ -1,0 +1,58 @@
+{
+  "interface": "web (serve.py) - same model and generation code as chat.py",
+  "model": "results/exp2-extended/model.pt",
+  "model_sha256": "9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e",
+  "completed_steps": 3000,
+  "fresh_context_per_prompt": true,
+  "block_size": 48,
+  "max_tokens": 24,
+  "external_api_used": false,
+  "turns": [
+    {
+      "prompt": "the report about the nurse explains the",
+      "reply": "care in detail .",
+      "unknown_words": [],
+      "truncated": false,
+      "model_sha256": "9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e",
+      "seed": 2026,
+      "temperature": 0.8,
+      "at": "2026-09-22T23:21:49+00:00"
+    },
+    {
+      "prompt": "the opposite of tall is",
+      "reply": "river .",
+      "unknown_words": [],
+      "truncated": false,
+      "model_sha256": "9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e",
+      "seed": 2027,
+      "temperature": 0.8,
+      "at": "2026-09-22T23:21:49+00:00"
+    },
+    {
+      "prompt": "ava did not buy tea . she bought milk . ava bought",
+      "reply": ".",
+      "unknown_words": [
+        "ava"
+      ],
+      "truncated": false,
+      "model_sha256": "9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e",
+      "seed": 2028,
+      "temperature": 0.8,
+      "at": "2026-09-22T23:21:50+00:00"
+    },
+    {
+      "prompt": "the report about the nurse explains the patient in detail . our school has a question about the new educator and lesson . a review of risk helped us understand the different deposit and the local professor explained the harvest to the market today as well as the consumer price and the offering",
+      "reply": ".",
+      "unknown_words": [
+        "as",
+        "explained",
+        "well"
+      ],
+      "truncated": true,
+      "model_sha256": "9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e",
+      "seed": 2029,
+      "temperature": 1.2,
+      "at": "2026-09-22T23:21:50+00:00"
+    }
+  ]
+}

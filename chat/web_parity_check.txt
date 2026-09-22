@@ -1,0 +1,20 @@
+number of parameters: 0.13M
+Transcript model : results/exp2-extended/model.pt
+Transcript SHA   : 9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e
+Loaded SHA       : 9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e
+Model hash matches.
+
+[1] seed=2026 T=0.8 MATCH
+    prompt : the report about the nurse explains the
+    web    : 'care in detail .'
+[2] seed=2027 T=0.8 MATCH
+    prompt : the opposite of tall is
+    web    : 'river .'
+[3] seed=2028 T=0.8 MATCH
+    prompt : ava did not buy tea . she bought milk . ava bought
+    web    : '.'
+[4] seed=2029 T=1.2 MATCH
+    prompt : the report about the nurse explains the patient in detail . our school h
+    web    : '.'
+
+RESULT: PASS - web replies are identical to the chat.py code path.

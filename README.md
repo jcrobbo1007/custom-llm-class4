@@ -445,6 +445,71 @@ name `ava` from the test story itself.
 
 ## Chat interface
 
+There are two interfaces — a web page and a terminal loop. **Both call the same trained
+model through the same generation function**, and neither uses any external API. Nothing is
+retrained by chatting, and nothing is written to `corpus/`.
+
+### Web interface (primary evidence)
+
+Backend [serve.py](serve.py) · chat panel added to the top of
+[embedding-viewer.html](embedding-viewer.html) · transcript
+[chat/web_chat_transcript.json](chat/web_chat_transcript.json)
+
+![The web chat interface answering four prompts against the experiment 2 model](chat/web-chat-screenshot.png)
+
+**This is a real browser screenshot** of the page at `http://localhost:4321`, captured with
+Playwright driving Chromium: each prompt was typed into the input and sent through the
+button, and each reply came back over HTTP from the local model.
+[chat/web-chat-fullpage.png](chat/web-chat-fullpage.png) is the whole page, showing the
+embedding viewer still working below the panel with
+`results/exp2-extended/checkpoint.json` loaded automatically.
+
+```bash
+python -m venv .venv && .venv/bin/pip install -r requirements.txt
+python serve.py
+# then open http://localhost:4321
+```
+
+`serve.py` loads `results/exp2-extended/model.pt`, prints its SHA-256, and serves the page
+plus three endpoints on `127.0.0.1:4321`:
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /` | the viewer page with the chat panel |
+| `GET /meta` | model path, SHA-256, completed steps, vocabulary size, context length |
+| `GET /checkpoint.json` | the one result file the page needs; the repo is **not** served as a directory |
+| `POST /chat` | `{prompt, temperature, seed?}` → `{reply, unknown_words, truncated, model_sha256, seed, temperature}` |
+
+It does **not** reimplement tokenisation or sampling: it imports `load_model`,
+`generate_reply` and `model_hash` from [run_evals.py](run_evals.py) — the same module
+`chat.py` imports. `fastapi` and `uvicorn` are the only added dependencies, and they are
+needed **only** for this web interface; the notebook and `chat.py` still need just
+`torch>=2.2`.
+
+**Verified identical to the terminal interface.** [scripts/verify_web_parity.py](scripts/verify_web_parity.py)
+replays every turn from the web transcript through `generate_reply` directly and compares
+the reply, the unknown-word list and the truncation flag. Output committed at
+[chat/web_parity_check.txt](chat/web_parity_check.txt):
+
+```
+Transcript SHA   : 9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e
+Loaded SHA       : 9d5a6a75d139953bec57aaec8a00c14cb18064d86780bf9d7b8c60a9ff50e66e
+[1] seed=2026 T=0.8 MATCH      [3] seed=2028 T=0.8 MATCH
+[2] seed=2027 T=0.8 MATCH      [4] seed=2029 T=1.2 MATCH
+RESULT: PASS - web replies are identical to the chat.py code path.
+```
+
+The four turns in the screenshot, from the saved transcript:
+
+| # | Prompt | T | Reply | Flags |
+| --- | --- | --- | --- | --- |
+| 1 | `the report about the nurse explains the` | 0.8 | `care in detail .` | — |
+| 2 | `the opposite of tall is` | 0.8 | `river .` | **failure** — `short` is taught in this exact frame |
+| 3 | `ava did not buy tea . she bought milk . ava bought` | 0.8 | `.` | unknown words: `ava` |
+| 4 | 68-token run-on sentence | 1.2 | `.` | unknown words: `as, explained, well`; **prompt over 48 tokens — only the most recent context was used** |
+
+### Terminal interface (secondary evidence)
+
 Code: [chat.py](chat.py) (from the source repo, unmodified). Transcripts:
 [chat/chat_transcript.json](chat/chat_transcript.json) (6 turns) and
 [chat/session_capture.json](chat/session_capture.json) (5 turns, the session pictured below).
@@ -462,12 +527,12 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python chat.py --model results/exp2-extended/model.pt --transcript chat/my_chat.json
 ```
 
-Requires only `torch>=2.2` (see [requirements.txt](requirements.txt)). It loads the
+`chat.py` requires only `torch>=2.2` (see [requirements.txt](requirements.txt)). It loads the
 **experiment 2 model**, `results/exp2-extended/model.pt`, whose SHA-256 is recorded in the
 transcript alongside `completed_steps: 3000`. `--transcript` refuses to overwrite an existing
 file, so use a new name.
 
-Interface facts: this is a **tiny language model** that continues a sentence rather than
+Interface facts (both interfaces): this is a **tiny language model** that continues a sentence rather than
 answering a question. **Every prompt starts a fresh context** (`fresh_context_per_prompt:
 true`); there is no conversation memory. The context limit is **48 tokens** and longer
 prompts are truncated to the most recent tokens with a printed warning. Words outside the
@@ -504,8 +569,14 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt jupyter nbconv
 # Rerun the 48 evals against the committed weights:
 .venv/bin/python run_evals.py --model results/exp2-extended/model.pt --output results/rerun
 
-# Chat with the trained model:
+# Chat with the trained model - web interface, then open http://localhost:4321
+.venv/bin/python serve.py
+
+# Chat with the trained model - terminal interface:
 .venv/bin/python chat.py --model results/exp2-extended/model.pt --transcript out.json
+
+# Confirm the web interface replies match the terminal code path:
+.venv/bin/python scripts/verify_web_parity.py
 
 # Re-verify corpus separation:
 .venv/bin/python scripts/leakage_check.py
@@ -676,8 +747,10 @@ custom_llm.executed.exp2.ipynb     EXECUTED, outputs intact — expanded corpus
 custom_llm.exp3-depth.ipynb        addendum source: n_layer 4 (separate copy)
 custom_llm.executed.exp3-depth.ipynb  EXECUTED, outputs intact — depth addendum
 custom_llm.py nanogpt_model.py     model + notebook source
-run_evals.py chat.py               eval runner and chat interface
-embedding-viewer.html              loads results/*/checkpoint.json
+run_evals.py chat.py               eval runner and terminal chat interface
+serve.py                           web chat backend (FastAPI) on localhost:4321
+embedding-viewer.html              upstream viewer + a chat panel added at the top
+scripts/verify_web_parity.py       proves web replies == chat.py replies
 evals/                             UNCHANGED 48-case suite from the source repo
 corpus/extension/opposites.md      74 lines written for this assignment
 corpus/extension/negation.md       91 lines written for this assignment
@@ -689,8 +762,30 @@ results/exp3-depth/                addendum: n_layer 4, run after submission
 results/viewer.png                 embedding viewer, exp 3 checkpoint, token "quiet"
 results/rerun-check/               evals rerun against the committed model.pt
 results/setup-10-steps/            timing only from the 10-step setup check — NOT evidence
-chat/chat_transcript.json          6 real interactions incl. 3 failures
+chat/chat_transcript.json          6 real terminal interactions incl. 3 failures
+chat/web_chat_transcript.json      4 real web interactions, with model hash
+chat/web-chat-screenshot.png       real browser screenshot of the web interface
+chat/web-chat-fullpage.png         whole page: chat panel + working embedding viewer
+chat/web_parity_check.txt          parity check output (web == terminal)
 ```
+
+**Files modified from the source repo.** `evals/language_evals.json`, `evals/README.md`,
+`run_evals.py`, `chat.py`, `nanogpt_model.py` and `custom_llm.py` are **byte-identical** to
+[the source repo](https://github.com/pepealonso95/custom-llm) (SHA-256 verified).
+
+`custom_llm.ipynb` **parses to an object identical to upstream's** — same 25 cells, same
+sources, same cell types, same metadata, no outputs — but its file hash differs by one byte,
+a trailing newline introduced when the settings in section 1 were written back through a JSON
+round-trip. My chosen settings (3,000 steps, lr 0.001) happen to equal the shipped defaults,
+so no cell content changed.
+
+**`embedding-viewer.html` is genuinely modified**: a chat panel was added at the top of `<main>`, with its own scoped CSS and a
+self-contained script. No existing viewer markup, CSS or JavaScript was altered — the panel
+feeds `results/exp2-extended/checkpoint.json` into the viewer's own file input exactly as a
+user picking the file would, so every original feature still works (verified in
+`chat/web-chat-fullpage.png`: 401 tokens loaded, map, neighbours and vector panel all live).
+Opened as a bare `file://` page with no backend running, the panel disables itself and the
+viewer behaves exactly as it did before.
 
 **Corpus sources and permissions.** Everything in `corpus/extension/` is plain text I wrote
 for this assignment — no third-party documents, no PDFs, no personal or confidential data, so
