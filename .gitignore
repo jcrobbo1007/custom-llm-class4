@@ -1,0 +1,6 @@
+llm_runs/
+*.zip
+.venv/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc

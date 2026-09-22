@@ -1,0 +1,33 @@
+{
+  "files": [
+    {
+      "file": "extension/negation.md",
+      "bytes": 5701,
+      "sha256": "8767e4398c429af7ddc291a4a4eeeae5f3423d81c6e6efc1ddeda444f4c582d6",
+      "warnings": [],
+      "characters": 5701,
+      "passages": 221,
+      "unique_passages": 215,
+      "preview": "the cup is not clean . it is dirty . the cup is dirty .\nthe chair is not old . it is new . the chair is new .\nthe road is not dry . it is wet . the road is wet .\nthe knife is not sharp . it is dull . the knife is dull .\nthe stone is not smooth . it is rough . the stone is rough .\nthe rope is not thi"
+    },
+    {
+      "file": "extension/opposites.md",
+      "bytes": 2885,
+      "sha256": "f3e8fb461c3a86b276aa059f1fb097cddd3feb86f94d98a6d881e19fa7c6196f",
+      "warnings": [],
+      "characters": 2885,
+      "passages": 74,
+      "unique_passages": 74,
+      "preview": "the opposite of tall is short .\nthe opposite of short is tall .\nthe opposite of wet is dry .\nthe opposite of dry is wet .\nthe opposite of near is far .\nthe opposite of far is near .\nthe opposite of fast is slow .\nthe opposite of slow is fast .\nthe opposite of hard is soft .\nthe opposite of soft is h"
+    }
+  ],
+  "ignored": [],
+  "external_passages": 295,
+  "mode": "classroom",
+  "base_passages": 6200,
+  "unique_passages": 4881,
+  "new_unique_passages": 289,
+  "duplicates_removed": 1614,
+  "max_passage_tokens": 47,
+  "split_unit": "deduplicated passage, not source file"
+}

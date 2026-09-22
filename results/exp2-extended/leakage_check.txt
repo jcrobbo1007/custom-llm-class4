@@ -1,0 +1,62 @@
+Corpus files checked : 2
+  corpus/extension/negation.md
+  corpus/extension/opposites.md
+Non-empty lines      : 165
+Eval cases           : 48
+Max allowed shared contiguous run : 6 tokens (a run of 7+ fails)
+
+Worst contiguous overlap per case (tokens shared with the nearest corpus line):
+case       category                 worst  nearest corpus line
+lang_31    negation                     6  [negation.md:26] the scarf is not grey . it is blue . the scarf is blue .
+lang_33    negation                     6  [negation.md:34] the shed is not empty . it is closed . the shed is closed .
+lang_28    opposites                    3  [opposites.md:1] the opposite of tall is short .
+lang_29    opposites                    3  [opposites.md:1] the opposite of tall is short .
+lang_30    opposites                    3  [opposites.md:1] the opposite of tall is short .
+lang_32    negation                     3  [negation.md:43] omar did not buy bread . he bought rice . omar bought rice .
+lang_40    spatial_relations            3  [negation.md:9] the bag is not light . it is heavy . the bag is heavy .
+lang_41    spatial_relations            3  [negation.md:7] the lamp is not bright . it is dim . the lamp is dim .
+lang_09    domain_place                 2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_10    domain_place                 2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_11    domain_place                 2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_12    domain_place                 2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_13    domain_place                 2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_14    domain_place                 2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_15    domain_place                 2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_16    domain_place                 2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_17    new_wording                  2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_18    new_wording                  2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_19    new_wording                  2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_20    new_wording                  2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_21    new_wording                  2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_22    new_wording                  2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_23    new_wording                  2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_24    new_wording                  2  [negation.md:67] the word not removes the first choice and the sentence keeps the...
+lang_35    reference                    2  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_37    sequence                     2  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_38    sequence                     2  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_39    sequence                     2  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_42    spatial_relations            2  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_44    everyday_knowledge           2  [negation.md:70] if a person did not take one thing the thing they took is named ...
+lang_01    domain_context               1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_02    domain_context               1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_03    domain_context               1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_04    domain_context               1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_05    domain_context               1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_06    domain_context               1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_07    domain_context               1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_08    domain_context               1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_25    grammar                      1  [negation.md:69] if something is not one colour the next colour named is the righ...
+lang_26    grammar                      1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_27    grammar                      1  [negation.md:42] mira did not want juice . she wanted water . mira wanted water .
+lang_34    reference                    1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_36    reference                    1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_43    everyday_knowledge           1  [negation.md:42] mira did not want juice . she wanted water . mira wanted water .
+lang_45    everyday_knowledge           1  [negation.md:17] the room is not noisy . it is quiet . the room is quiet .
+lang_46    categories_and_analogies     1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_47    categories_and_analogies     1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+lang_48    categories_and_analogies     1  [negation.md:1] the cup is not clean . it is dirty . the cup is dirty .
+
+No eval prompt, prompt fragment of the forbidden length, or choice list appears in the training corpus.
+NOTE: this is a lexical check. It cannot detect a paraphrase that reuses no long token run. The corpus was also written by hand to use different names, objects and framings from every eval case.
+
+RESULT: PASS
