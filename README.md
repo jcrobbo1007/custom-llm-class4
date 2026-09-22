@@ -402,8 +402,17 @@ These 48 cases influenced mine.
 
 ## Chat interface
 
-Code: [chat.py](chat.py) (from the source repo, unmodified). Transcript:
-[chat/chat_transcript.json](chat/chat_transcript.json).
+Code: [chat.py](chat.py) (from the source repo, unmodified). Transcripts:
+[chat/chat_transcript.json](chat/chat_transcript.json) (6 turns) and
+[chat/session_capture.json](chat/session_capture.json) (5 turns, the session pictured below).
+
+![Terminal session with the experiment 2 model](chat/chat-terminal.png)
+
+That image is **rendered from [chat/chat-session.txt](chat/chat-session.txt), the raw
+byte-for-byte capture of a real terminal session** run against
+`results/exp2-extended/model.pt` — it is a rendering of recorded output, not a photograph of
+a screen. The raw capture and the JSON transcript are both committed, so every line in the
+image can be checked against them.
 
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
@@ -422,7 +431,7 @@ prompts are truncated to the most recent tokens with a printed warning. Words ou
 401-word vocabulary are listed as `Unknown words:` after the reply. Generating replies
 **never retrains the model** and never adds chat text to the corpus.
 
-Six real turns, verbatim:
+The six turns of [chat/chat_transcript.json](chat/chat_transcript.json), verbatim (turns 1-5 also appear in the capture above; turn 6 is the truncation case):
 
 | # | Prompt | Reply | Note |
 | --- | --- | --- | --- |

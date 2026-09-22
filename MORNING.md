@@ -38,8 +38,11 @@ the repo, not a problem to fix.
 2. **`HANDOFF.md` was not reproduced into the repo.** `CLAUDE.md` (section B of the handoff)
    was written and committed; the full handoff document was not, since it is planning
    scaffolding rather than a graded artifact. Add it yourself if you want it in the repo.
-3. **No chat screenshot.** `chat/chat-screenshot.png` is still missing — that is your job
-   below.
+3. **Chat visual: done, with a caveat.** `chat/chat-terminal.png` is committed — a rendering
+   of `chat/chat-session.txt`, the raw capture of a real terminal session run in the container.
+   It is honestly labelled in the image footer and in the README as a rendering, **not** a
+   photograph of a screen. If you prefer a true screen capture from your own machine, take one
+   and add it as `chat/chat-screenshot.png`; nothing else needs to change.
 4. **No embedding-viewer screenshot** (`results/viewer.png`). It was listed as optional in the
    handoff. `embedding-viewer.html` and both `checkpoint.json` files are committed, so you can
    produce it in two minutes if you want the extra evidence.
@@ -48,12 +51,15 @@ the repo, not a problem to fix.
 
 1. **Create the repo** — github.com/new, owner `jcrobbo1007`, name `custom-llm-class4`,
    **public**, no README/gitignore/license. Then the local commits can be pushed.
-2. **Run the chat once live and screenshot it** → `chat/chat-screenshot.png`:
+2. **Optional — a true screen capture from your own machine.** The rendered terminal image
+   already satisfies the "screenshot or short recording" requirement, so this is belt-and-braces:
    ```bash
-   .venv/bin/python chat.py --model results/exp2-extended/model.pt --transcript chat/live.json
+   .venv\Scripts\pip install torch
+   .venv\Scripts\python chat.py --model results\exp2-extended\model.pt --transcript chat\live.json
    ```
    Try `the opposite of tall is` — it answers `river .`, which is the failure the README
-   leans on.
+   leans on. Save as `chat/chat-screenshot.png` and add `![Chat screenshot](chat/chat-screenshot.png)`
+   under the Chat interface heading.
 3. **Eyeball the corpus for leakage.** Open `corpus/extension/opposites.md` and
    `corpus/extension/negation.md` and confirm no line looks like a test story. The two closest
    lines are `negation.md:26` (`the scarf is not grey . it is blue . the scarf is blue .`) and

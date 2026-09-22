@@ -1,0 +1,17 @@
+number of parameters: 0.13M
+Tiny language model: short continuations, not a general assistant.
+Each prompt starts fresh. Context: 48 tokens. Type /quit to exit.
+You: the report about the nurse explains the
+Model: care in detail .
+You: the opposite of tall is
+Model: river .
+You: the cup is not clean . it is dirty . the cup is
+Model: drop .
+You: ava did not buy tea . she bought milk . ava bought
+Model: .
+Unknown words: ava
+You: the quantum blockchain paradigm disrupts
+Model: .
+Unknown words: blockchain, disrupts, paradigm, quantum
+You: /quit
+Saved transcript: chat/session_capture.json
