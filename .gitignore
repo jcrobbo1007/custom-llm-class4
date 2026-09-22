@@ -4,3 +4,4 @@ llm_runs/
 .ipynb_checkpoints/
 __pycache__/
 *.pyc
+run-*.log
