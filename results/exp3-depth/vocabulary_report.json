@@ -1,0 +1,7 @@
+{
+  "training_types": 398,
+  "retained_types": 398,
+  "training_unknown_rate": 0.0,
+  "validation_unknown_rate": 0.0016675931072818232,
+  "omitted_types": []
+}

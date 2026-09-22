@@ -11,6 +11,10 @@ learning at all**: every one of those five newly-scorable cases scored 0. The mo
 learned the shape of "the opposite of X is ___" without learning which word fills it.
 That gap between coverage and competence is the finding of this assignment.
 
+*(A third experiment testing the proposed fix — depth, `n_layer` 2→4 — was run after
+submission and is reported in the [addendum](#addendum--experiment-3-depth-run-after-submission).
+Experiments 1 and 2 below are the two required experiments and are unchanged.)*
+
 ---
 
 ## My choices and prediction
@@ -239,6 +243,34 @@ itself, never forwards. That causal mask is what makes next-word prediction a va
 signal. This is also the mechanism that *should* have solved negation — carrying "blue" from
 clause two into clause three is exactly an attention job — and the results below show two
 blocks and 3,000 steps were not enough to learn it.
+
+### The embedding space, and why opposites failed
+
+[results/viewer.png](results/viewer.png) — [embedding-viewer.html](embedding-viewer.html)
+with `results/exp3-depth/checkpoint.json` loaded, inspecting the word **`quiet`**:
+
+![Embedding viewer showing quiet and its nearest neighbours](results/viewer.png)
+
+`quiet` is token ID 253. Its three nearest vectors by cosine similarity in the full 64D
+space are:
+
+| Neighbour | Cosine |
+| --- | --- |
+| `green` | 0.692 |
+| `noisy` | 0.682 |
+| `hot` | 0.678 |
+
+**This is the opposites failure, visible in the weights.** `quiet` sits closest to `noisy`
+and `hot` — one is its own antonym, the other belongs to a different antonym pair entirely —
+and closer still to `green`, an unrelated colour. Training pushed every word that appears in
+the antonym slot into the same neighbourhood, because they all share the same contexts. The
+model encoded *"these words are the kind of thing that follows `the opposite of X is`"* and
+never encoded *which one goes with which*. That is the same "slot, not pairing" conclusion
+the eval probabilities give, arrived at independently from the vector space.
+
+Total movement of this vector during training: 0.553 in 64D. The PCA view compresses 64
+dimensions to 3 and retains 44.9% of the variance, so the map is indicative; the cosine
+figures above use the full space.
 
 ### Temperature — inference only, no weights change
 
@@ -532,6 +564,65 @@ depth, and the next variable to try would be steps. *What would complicate it.* 
 patterns dropping below 16/16 would mean the deeper model is overfitting a corpus this small,
 and the comparison would need a smaller learning rate to stay honest.
 
+**I then ran it. See the addendum below — the answer was "partly".**
+
+---
+
+## Addendum — experiment 3: depth (run after submission)
+
+**This experiment was run after the repository was submitted**, as a follow-up to the
+proposal above. Experiments 1 and 2 are the assignment's two required experiments and are
+unchanged; nothing in the sections above was recalculated. This is additional evidence, and
+it is the one place where a setting outside section 1 was deliberately changed — declared
+here, and made in a separate notebook copy
+([custom_llm.exp3-depth.ipynb](custom_llm.exp3-depth.ipynb)) so that
+[custom_llm.ipynb](custom_llm.ipynb) stays byte-identical to the upstream starter.
+
+**Single variable: `N_LAYER` 2 → 4.** Same corpus as exp 2, same 3,000 steps, same 0.001 peak
+learning rate, same seed 42, same split, same panels.
+Executed notebook: [custom_llm.executed.exp3-depth.ipynb](custom_llm.executed.exp3-depth.ipynb) ·
+Results: [results/exp3-depth/](results/exp3-depth/)
+
+| | Exp 2 (n_layer 2) | Exp 3 (n_layer 4) |
+| --- | --- | --- |
+| Parameters | 128,832 | 228,800 |
+| Elapsed | 35.552 s | 64.487 s |
+| Train / validation loss @ 3000 | 0.763006 / 0.712928 | 0.763193 / 0.711360 |
+| Correct / 48 | 24 | **25** |
+| Scorable / 48 | 29 | 29 |
+| Accuracy among scorable | 82.76% | **86.21%** |
+| starter_patterns | 16/16 | 16/16 |
+| starter_transfer | 8/8 | 8/8 |
+| **opposites** | 0/3 | **1/3** |
+| **negation** | 0/3 | 0/3 |
+
+**Verdict: partially confirmed.** Doubling depth for 100k more parameters bought exactly one
+more correct case — and it came from opposites, the composition task, exactly where the
+hypothesis said it should. Loss barely moved (0.712928 → 0.711360 validation), so this is not a
+fit improvement; it is a capability one. Starter patterns held at 16/16, so the deeper model
+did not overfit.
+
+The ranking shifts matter more than the single point:
+
+| Case | Correct word | Exp 2 probability (rank) | Exp 3 probability (rank) |
+| --- | --- | --- | --- |
+| lang_30 `the opposite of noisy is` | `quiet` | 0.00469 (2nd) | **0.03407 (1st — scored 1)** |
+| lang_28 `the opposite of hot is` | `cold` | 0.00431 (3rd) | 0.04969 (2nd, behind `heavy` at 0.05448) |
+| lang_31 `the box is not red …` | `blue` | 0.00117 (4th of 4) | 0.00132 (2nd) |
+| lang_33 `the door is not open …` | `closed` | 0.00010 (4th of 4) | 0.00042 (**still 4th of 4**) |
+
+Three of the four moved up, and `lang_28` missed by 0.005. So depth *is* the right variable
+for opposites — the mechanism is real, there just is not enough of it at n_layer 4.
+
+**Negation did not budge.** `lang_33` still ranks `closed` last of four despite the word
+sitting five tokens back in its own prompt. Depth did not install cross-clause copying. That
+strengthens rather than weakens the limitation section above: the negation failure is not
+simply "too few layers", and the next variable to test is no longer depth. On this evidence
+I would try **context-window usage** next — checking whether the attention rows at the third
+clause attend to the correction at all — before spending anything further on capacity.
+
+
+
 ---
 
 ## What I learned
@@ -582,6 +673,8 @@ README.md                          this file — the grading entry point
 custom_llm.ipynb                   notebook source (only section 1 edited)
 custom_llm.executed.exp1.ipynb     EXECUTED, outputs intact — starter corpus
 custom_llm.executed.exp2.ipynb     EXECUTED, outputs intact — expanded corpus
+custom_llm.exp3-depth.ipynb        addendum source: n_layer 4 (separate copy)
+custom_llm.executed.exp3-depth.ipynb  EXECUTED, outputs intact — depth addendum
 custom_llm.py nanogpt_model.py     model + notebook source
 run_evals.py chat.py               eval runner and chat interface
 embedding-viewer.html              loads results/*/checkpoint.json
@@ -592,6 +685,8 @@ scripts/leakage_check.py           stricter corpus/eval separation check
 results/prediction-exp1.md         prediction, timestamped before training
 results/exp1-starter/              full run folder (minus model_untrained.pt)
 results/exp2-extended/             full run folder + leakage_check.txt
+results/exp3-depth/                addendum: n_layer 4, run after submission
+results/viewer.png                 embedding viewer, exp 3 checkpoint, token "quiet"
 results/rerun-check/               evals rerun against the committed model.pt
 results/setup-10-steps/            timing only from the 10-step setup check — NOT evidence
 chat/chat_transcript.json          6 real interactions incl. 3 failures

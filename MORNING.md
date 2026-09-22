@@ -43,9 +43,17 @@ the repo, not a problem to fix.
    It is honestly labelled in the image footer and in the README as a rendering, **not** a
    photograph of a screen. If you prefer a true screen capture from your own machine, take one
    and add it as `chat/chat-screenshot.png`; nothing else needs to change.
-4. **No embedding-viewer screenshot** (`results/viewer.png`). It was listed as optional in the
-   handoff. `embedding-viewer.html` and both `checkpoint.json` files are committed, so you can
-   produce it in two minutes if you want the extra evidence.
+4. **Embedding-viewer screenshot: done.** `results/viewer.png` shows the viewer with exp 3's
+   `checkpoint.json` loaded, inspecting `quiet`. Its nearest vectors are `green` 0.692,
+   `noisy` 0.682, `hot` 0.678 — the opposites failure visible directly in the weights.
+
+## Added after submission
+
+5. **Experiment 3 — depth (`n_layer` 2→4).** Run as a follow-up to the README's proposed next
+   experiment, on a separate notebook copy so `custom_llm.ipynb` stays byte-identical to
+   upstream. Result: 25/48 (up from 24), opposites 1/3 (up from 0/3), negation still 0/3.
+   Partially confirms the hypothesis. Full write-up in the README addendum; experiments 1 and
+   2 were not touched.
 
 ## What Jack still has to do
 
