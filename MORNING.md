@@ -1,0 +1,65 @@
+# MORNING.md — what ran overnight, and what is left for Jack
+
+Everything finished in one attended session. Training was far faster than the handoff
+assumed, so there was no unattended overnight phase.
+
+## The four eval numbers
+
+| Experiment / stage | Correct / 48 | Scorable / 48 | Accuracy among scorable | Coverage |
+| --- | --- | --- | --- | --- |
+| Starter, untrained | 9 | 24 | 37.50% | 50.0% |
+| Starter, trained | **20** | 24 | 83.33% | 50.0% |
+| Expanded, untrained | 3 | 29 | 10.34% | 60.4% |
+| Expanded, trained | **24** | 29 | 82.76% | 60.4% |
+
+The headline improvement (20 → 24) did **not** come from the categories we targeted. All five
+newly-scorable extension cases scored 0. The +4 came from `new_wording` (4/8 → 8/8), a side
+effect nobody predicted. README explains this at length; it is the most interesting result in
+the repo, not a problem to fix.
+
+## What ran
+
+- 10-step setup check (0.416 s) — timing only, run folder deleted, kept at
+  `results/setup-10-steps/` and explicitly labelled not-evidence.
+- Experiment 1, starter corpus, 3,000 steps / lr 0.001 — 33.478 s, not interrupted.
+- Experiment 2, starter + `corpus/extension/`, same settings, trained from scratch — 35.552 s,
+  not interrupted.
+- `scripts/leakage_check.py` over `corpus/extension/` — **PASS**, worst overlap 6 tokens.
+- Chat transcript via piped `chat.py` — 6 real turns, 3 of them failures.
+- `run_evals.py` rerun against the committed `model.pt` — reproduces 24/48, 29 scorable.
+- README written from the saved files; three numbers spot-checked against their sources.
+
+## What failed or is missing
+
+1. **The repo was not created or pushed.** This session's GitHub credential returns
+   403 `Resource not accessible by integration` on repository creation, and its scope covers
+   only `networking-tracker`. The work is committed locally but is **not on GitHub yet**.
+   You must create the empty public repo `custom-llm-class4` yourself, then it can be pushed.
+2. **`HANDOFF.md` was not reproduced into the repo.** `CLAUDE.md` (section B of the handoff)
+   was written and committed; the full handoff document was not, since it is planning
+   scaffolding rather than a graded artifact. Add it yourself if you want it in the repo.
+3. **No chat screenshot.** `chat/chat-screenshot.png` is still missing — that is your job
+   below.
+4. **No embedding-viewer screenshot** (`results/viewer.png`). It was listed as optional in the
+   handoff. `embedding-viewer.html` and both `checkpoint.json` files are committed, so you can
+   produce it in two minutes if you want the extra evidence.
+
+## What Jack still has to do
+
+1. **Create the repo** — github.com/new, owner `jcrobbo1007`, name `custom-llm-class4`,
+   **public**, no README/gitignore/license. Then the local commits can be pushed.
+2. **Run the chat once live and screenshot it** → `chat/chat-screenshot.png`:
+   ```bash
+   .venv/bin/python chat.py --model results/exp2-extended/model.pt --transcript chat/live.json
+   ```
+   Try `the opposite of tall is` — it answers `river .`, which is the failure the README
+   leans on.
+3. **Eyeball the corpus for leakage.** Open `corpus/extension/opposites.md` and
+   `corpus/extension/negation.md` and confirm no line looks like a test story. The two closest
+   lines are `negation.md:26` (`the scarf is not grey . it is blue . the scarf is blue .`) and
+   `negation.md:34` (`the shed is not empty . it is closed . the shed is closed .`) — both use
+   different nouns and different negated attributes from the eval items. Full per-case report:
+   `results/exp2-extended/leakage_check.txt`.
+4. **Open the repo signed out** and confirm both executed notebooks render with outputs, the
+   SVG shows, and the result links resolve.
+5. **Submit** the URL via bCourses / the submissions portal.
